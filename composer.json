@@ -1,0 +1,10 @@
+{
+    "require": {
+        "sendgrid/sendgrid": "^7.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "RSWpSendgrid\\": "includes"
+        }
+    }
+}

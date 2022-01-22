@@ -29,7 +29,8 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
-
+ini_set("error_log", plugin_dir_path( __FILE__ ) . 'log.log');
+error_log('plugins start');
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
@@ -37,33 +38,8 @@ if ( ! defined( 'WPINC' ) ) {
  */
 define( 'WP_SENDGRID_API_VERSION', '1.0.0' );
 
-/**
- * The code that runs during plugin activation.
- * This action is documented in includes/class-wp-sendgrid-api-activator.php
- */
-function activate_wp_sendgrid_api() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-wp-sendgrid-api-activator.php';
-	Wp_Sendgrid_Api_Activator::activate();
-}
 
-/**
- * The code that runs during plugin deactivation.
- * This action is documented in includes/class-wp-sendgrid-api-deactivator.php
- */
-function deactivate_wp_sendgrid_api() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-wp-sendgrid-api-deactivator.php';
-	Wp_Sendgrid_Api_Deactivator::deactivate();
-}
-
-register_activation_hook( __FILE__, 'activate_wp_sendgrid_api' );
-register_deactivation_hook( __FILE__, 'deactivate_wp_sendgrid_api' );
-
-/**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
-require plugin_dir_path( __FILE__ ) . 'includes/class-wp-sendgrid-api.php';
-
+require_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
 
 /**
  * Begins execution of the plugin.
@@ -75,4 +51,4 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-wp-sendgrid-api.php';
  * @since    1.0.0
  */
 
-new Wp_Sendgrid_Api();
+new \RSWpSendgrid\WpSendgridApi();

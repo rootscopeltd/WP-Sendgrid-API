@@ -1,5 +1,7 @@
 <?php
 
+namespace RSWpSendgrid;
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -20,7 +22,7 @@
  * @subpackage Wp_Sendgrid_Api/admin
  * @author     Rootscope <contact@rootscope.co.uk>
  */
-class Wp_Sendgrid_Api_Admin {
+class WpSendgridApiAdmin {
 
 	/**
 	 * The ID of this plugin.
@@ -56,7 +58,7 @@ class Wp_Sendgrid_Api_Admin {
 	 * @access   private
 	 * @var      string    $menu_slug    The current menu_slug of this plugin.
 	 */
-	private $menu_slug = 'wp_sendgrid_api';
+	private $menu_slug = 'wpsendgridapi';
 
 	/**
 	 * Initialize the class and set its properties.
@@ -65,11 +67,15 @@ class Wp_Sendgrid_Api_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct($plugin_name, $version) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+	}
+
+	public function registerAdmin() {
 		add_action('admin_menu', [$this, 'addSettingsPage']);
+		add_action('admin_init', [$this, 'registerSettings']);
 	}
 
 	public function addSettingsPage() {
@@ -83,9 +89,45 @@ class Wp_Sendgrid_Api_Admin {
 	}
 
 	public function mainSettingsPage() {
-	  include_once plugin_dir_path(__FILE__) . 'templates/settings_page.php';
+	  include_once plugin_dir_path(__FILE__) . '../admin/templates/settings_page.php';
 	}
 
+	public function registerSettings() {
+		register_setting('wpsendgridapi', 'SENDGRID_API_KEY');
 
+		add_settings_section(
+			'wpsendgridapi_section',
+			__('Sendgrid API KEY', 'wpsendgridapi' ),
+			[$this, 'sectionCallback'],
+			'wpsendgridapi'
+		);
+
+		add_settings_field(
+			'SENDGRID_API_KEY',
+			'SENDGRID API KEY: ',
+			[$this, 'fieldCalback'],
+			'wpsendgridapi',
+			'wpsendgridapi_section'
+		);
+	}
+
+	public function fieldCalback() {
+		$sendgrid_api_key = get_option('SENDGRID_API_KEY');
+
+		printf('<input type="text" id="SENDGRID_API_KEY" name="SENDGRID_API_KEY" value="%s" />', esc_attr($sendgrid_api_key));
+	}
+
+	function sectionCallback() {
+		echo __('Enter API KEY from Sendgrid', 'wpsendgridapi');
+	}
+
+	public static function whitelistIP($ip) {
+		$sendgrid_api_key = get_option('SENDGRID_API_KEY');
+		$sg = new \SendGrid($sendgrid_api_key);
+		$response = $sg->client->access_settings()->whitelist()->get();
+		print $response->statusCode() . "\n";
+		print $response->body() . "\n";
+		print_r($response->headers());
+	}
 
 }

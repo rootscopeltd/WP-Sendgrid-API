@@ -1,5 +1,7 @@
 <?php
 
+namespace RSWpSendgrid;
+
 /**
  * The file that defines the core plugin class
  *
@@ -27,7 +29,7 @@
  * @subpackage Wp_Sendgrid_Api/includes
  * @author     Rootscope <contact@rootscope.co.uk>
  */
-class Wp_Sendgrid_Api {
+class WpSendgridApi {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -74,32 +76,7 @@ class Wp_Sendgrid_Api {
 		}
 		$this->plugin_name = 'wp-sendgrid-api';
 
-		$this->load_dependencies();
-		$this->define_admin_hooks();
-	}
-
-	/**
-	 * Load the required dependencies for this plugin.
-	 *
-	 * Include the following files that make up the plugin:
-	 *
-	 * - Wp_Sendgrid_Api_Loader. Orchestrates the hooks of the plugin.
-	 * - Wp_Sendgrid_Api_i18n. Defines internationalization functionality.
-	 * - Wp_Sendgrid_Api_Admin. Defines all hooks for the admin area.
-	 * - Wp_Sendgrid_Api_Public. Defines all hooks for the public side of the site.
-	 *
-	 * Create an instance of the loader which will be used to register the hooks
-	 * with WordPress.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 */
-	private function load_dependencies() {
-		/**
-		 * The class responsible for defining all actions that occur in the admin area.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-wp-sendgrid-api-admin.php';
-
+		$this->registerAdmin();
 	}
 
 	/**
@@ -109,8 +86,9 @@ class Wp_Sendgrid_Api {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
-		return new Wp_Sendgrid_Api_Admin( $this->get_plugin_name(), $this->get_version() );
+	private function registerAdmin() {
+		$admin = new WpSendgridApiAdmin($this->getPluginName(), $this->getVersion());
+		return $admin->registerAdmin();
 	}
 
 	/**
@@ -120,7 +98,7 @@ class Wp_Sendgrid_Api {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_plugin_name() {
+	public function getPluginName() {
 		return $this->plugin_name;
 	}
 
@@ -130,7 +108,7 @@ class Wp_Sendgrid_Api {
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function get_version() {
+	public function getVersion() {
 		return $this->version;
 	}
 
