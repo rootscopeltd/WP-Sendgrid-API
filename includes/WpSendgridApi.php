@@ -30,17 +30,6 @@ namespace RSWpSendgrid;
  * @author     Rootscope <contact@rootscope.co.uk>
  */
 class WpSendgridApi {
-
-	/**
-	 * The loader that's responsible for maintaining and registering all hooks that power
-	 * the plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   protected
-	 * @var      Wp_Sendgrid_Api_Loader    $loader    Maintains and registers all hooks for the plugin.
-	 */
-	protected $loader;
-
 	/**
 	 * The unique identifier of this plugin.
 	 *
@@ -59,6 +48,9 @@ class WpSendgridApi {
 	 */
 	protected $version;
 
+	private $sendgridClient;
+	private $whitelistedIps = [];
+
 	/**
 	 * Define the core functionality of the plugin.
 	 *
@@ -75,8 +67,6 @@ class WpSendgridApi {
 			$this->version = '1.0.0';
 		}
 		$this->plugin_name = 'wp-sendgrid-api';
-
-		$this->registerAdmin();
 	}
 
 	/**
@@ -86,9 +76,9 @@ class WpSendgridApi {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function registerAdmin() {
+	public function registerAdmin() {
 		$admin = new WpSendgridApiAdmin($this->getPluginName(), $this->getVersion());
-		return $admin->registerAdmin();
+		return $admin->register();
 	}
 
 	/**
@@ -112,4 +102,86 @@ class WpSendgridApi {
 		return $this->version;
 	}
 
+	private function setSendgridClient() {
+		$sendgrid_api_key = get_option('SENDGRID_API_KEY');
+		$sg = new \SendGrid($sendgrid_api_key);
+		$this->sendgridClient = $sg->client;
+	}
+
+	public function whitelistIP($ip) {
+		if (is_null($this->sendgridClient)) {
+			$this->setSendgridClient();
+		}
+
+		if (!$this->isIpWhitelisted($ip)) {
+			$requestBody = (object)[
+				'ips' => [
+					(object)['ip' => $ip],
+				],
+			];
+
+		  $request = $this->sendgridClient->access_settings()->whitelist()->post($requestBody);
+		  $response = json_decode($request->body());
+			if (empty($response->errors)) {
+				if ($response->result[0]->id) {
+					return [
+						'type' => 'success',
+						'message' => "Your IP ($ip) has been whitelisted successfully",
+					];
+				}
+			} else {
+				error_log('RSWpSendgrid [error]: whitelistIP: ' . json_encode($response->errors));
+			}
+		} else {
+			return [
+				'type' => 'success',
+				'message' => "IP address ($ip) is already whitelisted",
+			];
+		}
+
+		return $this->errorMessage();
+	}
+
+	private function errorMessage() {
+		return [
+			'type' => 'error',
+			'message' => 'There has been a problem with your request. Please try again shortly.',
+		];
+	}
+
+	public function isIpWhitelisted($ip) {
+		if (empty($this->whitelistedIps)) {
+			$this->getWhitelistedIps();
+		}
+
+		if(empty($this->whitelistedIps)) {
+			return false;
+		}
+
+		return in_array($ip, $this->whitelistedIps);
+	}
+
+	private function getWhitelistedIps() {
+		try {
+			$request = $this->sendgridClient->access_settings()->whitelist()->get();
+			$response = json_decode($request->body());
+		} catch (\Exception $e) {
+			error_log('RSWpSendgrid [error]: getWhitelistedIps: ' . $e->getMessage());
+			return false;
+		}
+
+		if (empty($response->errors)) {
+			$whitelistedIps = array_column($response->result, 'ip');
+			$this->whitelistedIps = array_map([$this, 'formatIp'], $whitelistedIps);
+		} else {
+			error_log('RSWpSendgrid [error]: ' . json_encode($response->errors));
+		}
+
+		return false;
+	}
+
+	public function formatIp($item) {
+		list($ip, $range) = explode('/', $item, 2);
+		return $ip;
+	}
 }

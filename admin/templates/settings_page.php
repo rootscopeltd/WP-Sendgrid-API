@@ -4,14 +4,20 @@ $sendgrid_api_key = get_option('SENDGRID_API_KEY');
 $change_api_key = filter_input(INPUT_GET, 'change_api_key', FILTER_SANITIZE_SPECIAL_CHARS);
 
 $sendgrid_ip = filter_input(INPUT_POST, 'SENDGRID_IP', FILTER_VALIDATE_IP);
+$whitelisted = [];
 
 if ($sendgrid_ip) {
-  $whitelisted = \RSWpSendgrid\WpSendgridApiAdmin::whitelistIP($sendgrid_ip);
+  $apiClient = new \RSWpSendgrid\WpSendgridApi();
+  $whitelisted = $apiClient->whitelistIP($sendgrid_ip);
 }
 ?>
 <div class="wrap">
 	<h1>SendGrid API</h1>
-
+  <?php if (!empty($whitelisted)): ?>
+		<div class="notice notice-<?php echo $whitelisted['type']; ?> is-dismissible">
+      <p><?php echo $whitelisted['message']; ?></p>
+    </div>
+  <?php endif; ?>
   <hr />
   <?php if (empty($sendgrid_api_key) || !empty($change_api_key)): ?>
   <form method="post" action="options.php">
