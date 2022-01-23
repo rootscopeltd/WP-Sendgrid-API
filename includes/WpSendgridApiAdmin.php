@@ -73,7 +73,7 @@ class WpSendgridApiAdmin {
 		$this->version = $version;
 	}
 
-	public function registerAdmin() {
+	public function register() {
 		add_action('admin_menu', [$this, 'addSettingsPage']);
 		add_action('admin_init', [$this, 'registerSettings']);
 	}
@@ -120,14 +120,4 @@ class WpSendgridApiAdmin {
 	function sectionCallback() {
 		echo __('Enter API KEY from Sendgrid', 'wpsendgridapi');
 	}
-
-	public static function whitelistIP($ip) {
-		$sendgrid_api_key = get_option('SENDGRID_API_KEY');
-		$sg = new \SendGrid($sendgrid_api_key);
-		$response = $sg->client->access_settings()->whitelist()->get();
-		print $response->statusCode() . "\n";
-		print $response->body() . "\n";
-		print_r($response->headers());
-	}
-
 }

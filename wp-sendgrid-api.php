@@ -29,8 +29,7 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
-ini_set("error_log", plugin_dir_path( __FILE__ ) . 'log.log');
-error_log('plugins start');
+
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
@@ -51,4 +50,5 @@ require_once plugin_dir_path( __FILE__ ) . 'vendor/autoload.php';
  * @since    1.0.0
  */
 
-new \RSWpSendgrid\WpSendgridApi();
+$WpSendgridApi = new \RSWpSendgrid\WpSendgridApi();
+$WpSendgridApi->registerAdmin();
