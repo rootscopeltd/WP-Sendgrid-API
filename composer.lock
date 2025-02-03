@@ -70,16 +70,16 @@
         },
         {
             "name": "sendgrid/sendgrid",
-            "version": "8.1.5",
+            "version": "8.1.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sendgrid/sendgrid-php.git",
-                "reference": "9714ea7d69a9927bf4a4090afd18dd2636137030"
+                "reference": "5f6be4c940d34155dbd1029b52bd242b719561ea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sendgrid/sendgrid-php/zipball/9714ea7d69a9927bf4a4090afd18dd2636137030",
-                "reference": "9714ea7d69a9927bf4a4090afd18dd2636137030",
+                "url": "https://api.github.com/repos/sendgrid/sendgrid-php/zipball/5f6be4c940d34155dbd1029b52bd242b719561ea",
+                "reference": "5f6be4c940d34155dbd1029b52bd242b719561ea",
                 "shasum": ""
             },
             "require": {
@@ -131,9 +131,9 @@
             ],
             "support": {
                 "issues": "https://github.com/sendgrid/sendgrid-php/issues",
-                "source": "https://github.com/sendgrid/sendgrid-php/tree/8.1.5"
+                "source": "https://github.com/sendgrid/sendgrid-php/tree/8.1.9"
             },
-            "time": "2024-12-12T17:06:21+00:00"
+            "time": "2025-01-28T10:34:42+00:00"
         },
         {
             "name": "starkbank/ecdsa",
@@ -194,5 +194,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
